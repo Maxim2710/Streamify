@@ -1,0 +1,22 @@
+jwt:
+  secret: 984hg493gh0439thr0429guru2309yh937gc763fe87t3f89723gf
+  lifetime: 20160m
+
+spring:
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 12345
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+
+  application:
+    name: streamifyAuth
+
+server:
+  port: 8080
+
