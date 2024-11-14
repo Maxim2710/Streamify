@@ -66,16 +66,4 @@ public class AuthService {
 
         return accountResponse;
     }
-
-    public UserProfileResponse getUserProfile(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
-        UserProfileResponse userProfile = new UserProfileResponse();
-        userProfile.setId(user.getId());
-        userProfile.setUsername(user.getUsername());
-        userProfile.setEmail(user.getEmail());
-
-        return userProfile;
-    }
 }

@@ -24,10 +24,4 @@ public class AuthController {
         AccountResponseLogin response = authService.authenticateUser(authenticationForm);
         return ResponseEntity.ok(response);
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable Long id) {
-        UserProfileResponse response = authService.getUserProfile(id);
-        return ResponseEntity.ok(response);
-    }
 }
