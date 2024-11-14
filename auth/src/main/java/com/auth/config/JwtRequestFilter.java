@@ -10,11 +10,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -34,18 +38,29 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 fullName = jwtTokenUtils.getUsernameFromToken(jwt);
             } catch (ExpiredJwtException e) {
                 log.debug("The token's lifetime has expired");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
+                return;
             } catch (SignatureException e) {
                 log.debug("The signature is incorrect");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token signature");
+                return;
             }
         }
 
         if (fullName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    fullName,
-                    null
-            );
-            SecurityContextHolder.getContext().setAuthentication(token);
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(
+                            fullName,
+                            null,
+                            authorities
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
-        filterChain.doFilter(request,response);
+
+        filterChain.doFilter(request, response);
     }
 }
