@@ -1,0 +1,26 @@
+spring:
+  security:
+    user:
+      password: 528f3e4a-a7e8-44bc-a5b0-8c31ec0a95f7
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 12345
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+
+  application:
+    name: streamifyPost
+
+server:
+  port: 8081
+
+ssh:
+  host: host
+  port: port
+  username: streamifyAdmin
+  password: 12345
