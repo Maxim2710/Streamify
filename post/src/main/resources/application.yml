@@ -1,4 +1,5 @@
 spring:
+
   security:
     user:
       password: 528f3e4a-a7e8-44bc-a5b0-8c31ec0a95f7
@@ -13,14 +14,23 @@ spring:
     hibernate:
       ddl-auto: update
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+
   application:
     name: streamifyPost
 
 server:
   port: 8081
 
+connector:
+  auth:
+    url: http://localhost:8080/api/users
+
 ssh:
-  host: host
-  port: port
-  username: streamifyAdmin
+  host: 192.168.0.185
+  port: 22
+  username: streamifyadmin
   password: 12345
+
