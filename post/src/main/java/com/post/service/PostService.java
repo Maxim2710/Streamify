@@ -108,19 +108,15 @@ public class PostService {
     }
 
     public PostWithMediaDTO getPostById(Long postId) {
-        // Проверка, существует ли пост
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post with id " + postId + " not found"));
 
-        // Получение списка медиа, связанных с постом
         List<Media> mediaList = mediaRepository.findByPost(post);
 
-        // Преобразование медиа в DTO
         List<MediaDTO> mediaDTOs = mediaList.stream()
                 .map(media -> new MediaDTO(media.getMediaType(), media.getUrl()))
                 .collect(Collectors.toList());
 
-        // Возврат DTO с данными поста
         return new PostWithMediaDTO(
                 post.getId(),
                 post.getUserId(),
@@ -130,5 +126,16 @@ public class PostService {
         );
     }
 
+    public void deletePostById(String token, Long postId) {
+        UserBom userBom = authConnector.getCurrentUser(token);
 
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post with id " + postId + " not found"));
+
+        if (!post.getUserId().equals(userBom.getId())) {
+            throw new SecurityException("You are not authorized to delete this post");
+        }
+
+        postRepository.delete(post);
+    }
 }
