@@ -38,4 +38,10 @@ public class PostController {
         return ResponseEntity.ok(postWithMediaDTO);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePostById(@RequestHeader(name = "Authorization") String token, @PathVariable Long id) {
+        postService.deletePostById(token, id);
+        return ResponseEntity.ok("Post deleted successfully");
+    }
+
 }
