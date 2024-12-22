@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,5 +63,72 @@ public class PostService {
 
         return new PostWithMediaDTO(post.getId(), post.getUserId(), post.getContent(), post.getCreatedAt(), mediaDTOs);
     }
+
+    public PostWithMediaDTO repostPost(String token, Long originalPostId) {
+        UserBom userBom = authConnector.getCurrentUser(token);
+
+        Post originalPost = postRepository.findById(originalPostId)
+                .orElseThrow(() -> new IllegalArgumentException("Post with id " + originalPostId + " not found"));
+
+        Post repost = new Post();
+        repost.setUserId(userBom.getId());
+
+        String originalContent = originalPost.getContent();
+        repost.setContent("Repost of post ID: " + originalPostId +
+                (originalContent != null && !originalContent.isBlank() ? "\nOriginal Content: " + originalContent : ""));
+        repost.setCreatedAt(LocalDateTime.now());
+        repost = postRepository.save(repost);
+
+        final Post finalRepost = repost;
+
+        List<Media> originalMedia = mediaRepository.findByPost(originalPost);
+        List<Media> repostMedia = originalMedia.stream()
+                .map(media -> {
+                    Media newMedia = new Media();
+                    newMedia.setPost(finalRepost);
+                    newMedia.setMediaType(media.getMediaType());
+                    newMedia.setUrl(media.getUrl());
+                    return newMedia;
+                })
+                .collect(Collectors.toList());
+
+        mediaRepository.saveAll(repostMedia);
+
+        List<MediaDTO> mediaDTOs = repostMedia.stream()
+                .map(media -> new MediaDTO(media.getMediaType(), media.getUrl()))
+                .collect(Collectors.toList());
+
+        return new PostWithMediaDTO(
+                repost.getId(),
+                repost.getUserId(),
+                repost.getContent(),
+                repost.getCreatedAt(),
+                mediaDTOs
+        );
+    }
+
+    public PostWithMediaDTO getPostById(Long postId) {
+        // Проверка, существует ли пост
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post with id " + postId + " not found"));
+
+        // Получение списка медиа, связанных с постом
+        List<Media> mediaList = mediaRepository.findByPost(post);
+
+        // Преобразование медиа в DTO
+        List<MediaDTO> mediaDTOs = mediaList.stream()
+                .map(media -> new MediaDTO(media.getMediaType(), media.getUrl()))
+                .collect(Collectors.toList());
+
+        // Возврат DTO с данными поста
+        return new PostWithMediaDTO(
+                post.getId(),
+                post.getUserId(),
+                post.getContent(),
+                post.getCreatedAt(),
+                mediaDTOs
+        );
+    }
+
 
 }
