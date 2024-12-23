@@ -47,4 +47,23 @@ public class CommentService {
 
         return commentRepository.findByPostId(postId);
     }
+
+    public void deleteComment(String token, Long commentId) {
+        UserBom userBom = authConnector.getCurrentUser(token);
+        Long userId = userBom.getId();
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+        boolean isOwner = comment.getUserId().equals(userId);
+        boolean isPostOwner = postRepository.findById(comment.getPostId())
+                .map(post -> post.getUserId().equals(userId))
+                .orElse(false);
+
+        if (!isOwner && !isPostOwner) {
+            throw new IllegalStateException("You are not authorized to delete this comment");
+        }
+
+        commentRepository.delete(comment);
+    }
 }
