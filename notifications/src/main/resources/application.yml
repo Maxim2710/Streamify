@@ -14,11 +14,11 @@ spring:
       ddl-auto: update
 
   application:
-    name: streamifyFeedback
+    name: streamifyNotifications
 
 connector:
   auth:
     url: http://localhost:8080/api/users
 
 server:
-  port: 8082
+  port: 8083
