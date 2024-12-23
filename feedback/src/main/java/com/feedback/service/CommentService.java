@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class CommentService {
@@ -37,5 +38,13 @@ public class CommentService {
         comment.setCreatedAt(LocalDateTime.now());
 
         return commentRepository.save(comment);
+    }
+
+    public List<Comment> getCommentsByPostId(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new IllegalArgumentException("Post not found");
+        }
+
+        return commentRepository.findByPostId(postId);
     }
 }
