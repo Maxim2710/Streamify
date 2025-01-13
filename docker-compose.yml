@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: streamify_account
       POSTGRES_USER: streamify_account_admin
-      POSTGRES_PASSWORD: StrongPassword123
+      POSTGRES_PASSWORD: I_PMr1Dbvke/]ws
     volumes:
       - streamify_data:/var/lib/postgresql/data
     healthcheck:
