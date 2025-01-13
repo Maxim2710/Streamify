@@ -5,9 +5,9 @@ spring:
       password: 528f3e4a-a7e8-44bc-a5b0-8c31ec0a95f7
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: 12345
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/streamify_account
+    username: streamify_account_admin
+    password: I_PMr1Dbvke/]ws
 
   jpa:
     open-in-view: false
