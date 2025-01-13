@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/streamify_account
     username: streamify_account_admin
-    password: I_PMr1Dbvke/]ws
+    password: I_PMr1Dbvke;QWE
 
   jpa:
     open-in-view: false
@@ -26,7 +26,7 @@ server:
 
 connector:
   auth:
-    url: http://localhost:8080/api/users
+    url: http://auth:8080/api/users
 
 ssh:
   host: 192.168.0.180
