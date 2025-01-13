@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: streamify_account
       POSTGRES_USER: streamify_account_admin
-      POSTGRES_PASSWORD: I_PMr1Dbvke/]ws
+      POSTGRES_PASSWORD: I_PMr1Dbvke;QWE
     volumes:
       - streamify_data:/var/lib/postgresql/data
     healthcheck:
@@ -16,10 +16,10 @@ services:
     networks:
       - streamify_net
     ports:
-      - "54324:5432"
+      - "54320:5432"
     restart: unless-stopped
 
-  auth_service:
+  auth:
     container_name: streamify_auth
     image: streamify_auth:latest
     build: ./auth
@@ -45,13 +45,15 @@ services:
       streamify_postgres:
         condition: service_healthy
         restart: true
-      auth_service:
+      auth:
         condition: service_started
         restart: false
     networks:
       - streamify_net
     ports:
       - "8081:8081"
+    volumes:
+      - streamify_known_hosts:/Users/admin/.ssh
     restart: unless-stopped
 
   feedbacks_service:
@@ -64,7 +66,7 @@ services:
       streamify_postgres:
         condition: service_healthy
         restart: true
-      auth_service:
+      auth:
         condition: service_started
         restart: false
       posts_service:
@@ -86,7 +88,7 @@ services:
       streamify_postgres:
         condition: service_healthy
         restart: true
-      auth_service:
+      auth:
         condition: service_started
         restart: false
       feedbacks_service:
@@ -108,7 +110,7 @@ services:
       streamify_postgres:
         condition: service_healthy
         restart: true
-      auth_service:
+      auth:
         condition: service_started
         restart: false
       posts_service:
@@ -125,6 +127,7 @@ services:
 
 volumes:
   streamify_data:
+  streamify_known_hosts:
 
 networks:
   streamify_net:
