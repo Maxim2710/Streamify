@@ -1,0 +1,131 @@
+services:
+  streamify_postgres:
+    container_name: streamify_db
+    image: postgres
+    environment:
+      POSTGRES_DB: streamify_account
+      POSTGRES_USER: streamify_account_admin
+      POSTGRES_PASSWORD: StrongPassword123
+    volumes:
+      - streamify_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U streamify_account_admin -d streamify_account" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - streamify_net
+    ports:
+      - "54324:5432"
+    restart: unless-stopped
+
+  auth_service:
+    container_name: streamify_auth
+    image: streamify_auth:latest
+    build: ./auth
+    environment:
+      POSTGRES_HOST: streamify_postgres
+    depends_on:
+      streamify_postgres:
+        condition: service_healthy
+        restart: true
+    networks:
+      - streamify_net
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  posts_service:
+    container_name: streamify_posts
+    image: streamify_posts:latest
+    build: ./post
+    environment:
+      POSTGRES_HOST: streamify_postgres
+    depends_on:
+      streamify_postgres:
+        condition: service_healthy
+        restart: true
+      auth_service:
+        condition: service_started
+        restart: false
+    networks:
+      - streamify_net
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  feedbacks_service:
+    container_name: streamify_likes_comments
+    image: streamify_feedbacks:latest
+    build: ./feedback
+    environment:
+      POSTGRES_HOST: streamify_postgres
+    depends_on:
+      streamify_postgres:
+        condition: service_healthy
+        restart: true
+      auth_service:
+        condition: service_started
+        restart: false
+      posts_service:
+        condition: service_started
+        restart: false
+    networks:
+      - streamify_net
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+
+  notifications_service:
+    container_name: streamify_notifications
+    image: streamify_notifications:latest
+    build: ./notifications
+    environment:
+      POSTGRES_HOST: streamify_postgres
+    depends_on:
+      streamify_postgres:
+        condition: service_healthy
+        restart: true
+      auth_service:
+        condition: service_started
+        restart: false
+      feedbacks_service:
+        condition: service_started
+        restart: false
+    networks:
+      - streamify_net
+    ports:
+      - "8084:8084"
+    restart: unless-stopped
+
+  feed_service:
+    container_name: streamify_feed
+    image: streamify_feed:latest
+    build: ./feed
+    environment:
+      POSTGRES_HOST: streamify_postgres
+    depends_on:
+      streamify_postgres:
+        condition: service_healthy
+        restart: true
+      auth_service:
+        condition: service_started
+        restart: false
+      posts_service:
+        condition: service_started
+        restart: false
+      notifications_service:
+        condition: service_started
+        restart: false
+    networks:
+      - streamify_net
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+
+volumes:
+  streamify_data:
+
+networks:
+  streamify_net:
+    driver: bridge
